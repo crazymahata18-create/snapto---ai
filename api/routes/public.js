@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getDb } = require('../db/database');
-const { sendBookingConfirmation } = require('../utils/emailService');
+const { sendBookingConfirmation, sendPreOrderConfirmation } = require('../utils/emailService');
 
 // POST /api/public/leads (Waitlist Pre-order)
 router.post('/leads', async (req, res) => {
@@ -20,7 +20,7 @@ router.post('/leads', async (req, res) => {
     await db.run('INSERT INTO leads (email) VALUES (?)', [email]);
     
     // Send confirmation email
-    await sendBookingConfirmation(email);
+    await sendPreOrderConfirmation(email);
     
     res.json({ success: true, message: 'Added to priority waitlist' });
   } catch (err) {
