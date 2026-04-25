@@ -101,3 +101,13 @@ CMD ["node", "server.js"]
 ---
 
 Built by the SnapTo AI Team © 2026
+
+---
+
+### 🛡️ Admin System Monitor (New)
+A private, real-time monitoring dashboard for administrators.
+- **Access**: Log in as `admin` (Password: `admin123456`) and click the red shield icon in the dashboard.
+- **Real-time Stats**: Tracks live WebSocket connections and total user counts.
+- **Email Registry**: Full view of all registered users and captured leads.
+- **Secure**: Restricted to users with the `admin` role via JWT.
+
