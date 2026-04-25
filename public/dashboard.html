@@ -93,7 +93,7 @@
           <div class="notification-badge" id="notif-badge" style="display:none;"></div>
         </button>
         <div class="dash-clock" id="dash-clock">--:--:--</div>
-        <div class="dash-user" onclick="Dashboard.logout()" title="Logout">
+        <div class="dash-user" onclick="Auth.logout()" title="Logout">
           <div class="dash-user-avatar" id="user-avatar">DS</div>
           <div class="dash-user-name" id="user-name">Director Sharma</div>
         </div>
@@ -335,7 +335,7 @@
               <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--white); margin-bottom:6px;">Sign out of SnapTo AI Dashboard</div>
               <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted);">You will be redirected to the login page. Your session will end securely.</div>
             </div>
-            <button onclick="Dashboard.logout()" style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:14px 32px; border:1px solid rgba(255,45,85,0.6); background:rgba(255,45,85,0.15); color:var(--red); cursor:pointer; transition:all 0.25s; flex-shrink:0; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);" onmouseover="this.style.background='rgba(255,45,85,0.3)';this.style.boxShadow='0 0 20px rgba(255,45,85,0.3)'" onmouseout="this.style.background='rgba(255,45,85,0.15)';this.style.boxShadow='none'">🚪 LOG OUT</button>
+            <button onclick="Auth.logout()" style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:14px 32px; border:1px solid rgba(255,45,85,0.6); background:rgba(255,45,85,0.15); color:var(--red); cursor:pointer; transition:all 0.25s; flex-shrink:0; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);" onmouseover="this.style.background='rgba(255,45,85,0.3)';this.style.boxShadow='0 0 20px rgba(255,45,85,0.3)'" onmouseout="this.style.background='rgba(255,45,85,0.15)';this.style.boxShadow='none'">🚪 LOG OUT</button>
           </div>
         </div>
 
