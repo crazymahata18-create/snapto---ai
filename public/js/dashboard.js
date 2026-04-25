@@ -99,9 +99,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="emp-name">${e.name}</div>
           <div class="emp-role">${e.role}</div>
         </div>
-        <div class="emp-status-dot" style="background:${statusColor(e.status)};box-shadow:0 0 8px ${statusColor(e.status)};"></div>
+        <div class="emp-status-dot ${e.status === 'working' ? 'working' : ''}" style="background:${statusColor(e.status)};box-shadow:0 0 8px ${statusColor(e.status)};"></div>
       </div>
     `).join('');
+
+    // Add click listeners
+    employeeList.querySelectorAll('.employee-row').forEach(row => {
+      row.onclick = () => {
+        const id = row.getAttribute('data-id');
+        const emp = emps.find(e => e.id === id);
+        if (emp) {
+          showToast(`Scanning identification for ${emp.name}...`, 'ok');
+          scanCamera(null, emp); // Scan this employee
+        }
+      };
+    });
   }
 
   function updateSidebarStats(stats) {

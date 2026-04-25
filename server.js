@@ -82,7 +82,14 @@ alertEngine.on('alertResolved', (alert) => {
 
 // Broadcast employee status updates periodically
 setInterval(() => {
-  const { employees } = require('./api/data/mockData');
+  const { employees, simulateStatusChanges } = require('./api/data/mockData');
+  
+  // Simulate 1-3 changes every interval
+  const changeCount = Math.floor(Math.random() * 3) + 1;
+  for (let i = 0; i < changeCount; i++) {
+    simulateStatusChanges();
+  }
+
   const statusUpdate = employees.map(e => ({
     id: e.id,
     status: e.status,
