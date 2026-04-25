@@ -37,6 +37,9 @@ router.post('/login', async (req, res) => {
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new Error("CRITICAL: JWT_SECRET environment variable is missing.");
 
+    // Update login timestamp
+    await db.run('UPDATE users SET last_login = CURRENT_TIMESTAMP, last_active = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
+
     const token = jwt.sign(
       { id: user.id, username: user.username, name: user.name, role: user.role },
       secret,

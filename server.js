@@ -38,6 +38,7 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 
 const wsClients = new Set();
+app.set('wsClients', wsClients);
 
 wss.on('connection', (ws) => {
   wsClients.add(ws);
@@ -180,4 +181,8 @@ server.listen(PORT, async () => {
   console.log('');
 });
 
-module.exports = { app, server };
+function getWsClientCount() {
+  return wsClients.size;
+}
+
+module.exports = { app, server, getWsClientCount };

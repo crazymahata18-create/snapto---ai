@@ -38,10 +38,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!Auth.requireAuth()) return;
 
     // Set user info
-    const user = Auth.getUser();
     if (user && userNameEl) {
       userNameEl.textContent = user.name || user.username;
       if (userAvatarEl) userAvatarEl.textContent = (user.name || 'U').substring(0, 2).toUpperCase();
+      
+      // Show admin monitor link if role is admin
+      const adminLink = document.getElementById('admin-monitor-link');
+      if (adminLink && user.role === 'admin') {
+        adminLink.style.display = 'flex';
+      }
     }
 
     // Start clock

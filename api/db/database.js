@@ -28,6 +28,8 @@ async function initDb() {
       password TEXT,
       name TEXT,
       role TEXT,
+      last_login DATETIME,
+      last_active DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
