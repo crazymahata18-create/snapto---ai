@@ -62,13 +62,20 @@ async function sendPreOrderConfirmation(toEmail) {
 /**
  * Sends a meeting booking confirmation email.
  */
-async function sendBookingConfirmation(toEmail, name = 'Valued Customer') {
+async function sendBookingConfirmation(toEmail, name = 'Valued Customer', date, time) {
   const subject = 'Meeting Confirmed - SnapTo AI';
   const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
       <h2 style="color: #00ffcc;">Meeting Confirmed</h2>
       <p>Hello ${name},</p>
       <p>Your meeting with the SnapTo AI team is officially scheduled!</p>
+      
+      <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #00ffcc;">
+        <p style="margin: 0; font-weight: bold; color: #333;">Meeting Details:</p>
+        <p style="margin: 5px 0 0 0;">📅 <strong>Date:</strong> ${date}</p>
+        <p style="margin: 5px 0 0 0;">⏰ <strong>Time:</strong> ${time}</p>
+      </div>
+
       <p><strong>Thanks for choosing us and we are very thankful that you trust us.</strong> We look forward to discussing how we can help secure and optimize your workspace.</p>
       <hr style="border: 0; border-top: 1px solid #eee;">
       <p style="font-size: 0.8rem; color: #666;">SnapTo AI Command Center</p>

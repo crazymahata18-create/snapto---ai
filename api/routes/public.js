@@ -52,7 +52,7 @@ router.post('/meetings', async (req, res) => {
     );
 
     // Send confirmation email
-    await sendBookingConfirmation(email, name);
+    await sendBookingConfirmation(email, name, date, time);
 
     res.json({ success: true, message: 'Meeting scheduled successfully' });
   } catch (err) {
