@@ -201,6 +201,15 @@
     animation: fadeInUp 0.9s 0.1s ease both;
     position: relative;
   }
+  .hero-title span {
+    display: block;
+    line-height: 1;
+    border: none !important;
+  }
+  .hero-title span::before, .hero-title span::after {
+    display: none !important;
+    content: none !important;
+  }
   .hero-title .line1 { color: var(--white); display: block; text-shadow: 0 0 30px rgba(255,255,255,0.1); }
   .hero-title .line2 {
     color: transparent;
@@ -226,7 +235,7 @@
     color: var(--cyan);
     display: block;
     text-shadow: 0 0 40px rgba(0,229,255,0.5);
-    border-left: none;
+    border: none !important;
   }
 
   .hero-desc {
