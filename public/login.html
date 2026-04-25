@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapTo AI — Login</title>
+  <meta name="description" content="Sign in to the SnapTo AI Command Dashboard — intelligent workplace monitoring powered by AI.">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(0,229,255,0.06), transparent 50%),
+        radial-gradient(ellipse at 70% 50%, rgba(0,255,157,0.04), transparent 50%);
+    }
+
+    .login-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,229,255,0.08);
+    }
+
+    .login-header {
+      padding: 36px 36px 24px;
+      text-align: center;
+    }
+
+    .login-logo {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--cyan);
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(0,229,255,0.5);
+      margin-bottom: 6px;
+    }
+    .login-logo span { color: var(--green); }
+
+    .login-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .login-body { padding: 0 36px 36px; }
+
+    .login-form { display: flex; flex-direction: column; gap: 20px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .login-btn {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 16px;
+      border: none;
+      background: var(--cyan);
+      color: var(--bg);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    }
+    .login-btn:hover { background: var(--green); box-shadow: var(--glow-green); }
+    .login-btn:disabled { opacity: 0.5; cursor: default; }
+
+    .login-error {
+      background: rgba(255,45,85,0.1);
+      border: 1px solid rgba(255,45,85,0.3);
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--red);
+      display: none;
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .login-divider::before, .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .demo-accounts {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      line-height: 2;
+    }
+    .demo-accounts strong { color: var(--cyan); }
+    .demo-account-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 3px;
+    }
+    .demo-account-row:hover { border-color: var(--border); background: rgba(0,229,255,0.05); }
+
+    .login-footer {
+      border-top: 1px solid var(--border);
+      padding: 18px 36px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .login-footer a { color: var(--cyan); }
+
+    .login-skip {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    .login-skip:hover { color: var(--cyan); }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-grid-bg"></div>
+
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">SNAP<span>TO</span> AI</div>
+        <div class="login-subtitle">Command Dashboard Access</div>
+      </div>
+
+      <div class="login-body">
+        <div class="login-error" id="login-error"></div>
+
+        <form class="login-form" id="login-form" onsubmit="return handleLogin(event)">
+          <div class="form-group">
+            <label class="input-label" for="username">Username</label>
+            <input type="text" id="username" class="input-field" placeholder="Enter username" autocomplete="username" required>
+          </div>
+          <div class="form-group">
+            <label class="input-label" for="password">Password</label>
+            <input type="password" id="password" class="input-field" placeholder="Enter password" autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="login-btn" id="login-btn">Access Dashboard</button>
+        </form>
+
+
+      </div>
+
+      <div class="login-footer">
+        <a href="/">← Back to SnapTo AI Home</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api-client.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (Auth.isLoggedIn()) {
+      window.location.href = '/dashboard.html';
+    }
+
+    function fillDemo(user, pass) {
+      document.getElementById('username').value = user;
+      document.getElementById('password').value = pass;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const errorEl = document.getElementById('login-error');
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      btn.textContent = 'AUTHENTICATING...';
+      errorEl.style.display = 'none';
+
+      try {
+        await Auth.login(username, password);
+        btn.textContent = '✓ ACCESS GRANTED';
+        btn.style.background = 'var(--green)';
+        setTimeout(() => window.location.href = '/dashboard.html', 600);
+      } catch (err) {
+        errorEl.textContent = err.message || 'Invalid credentials';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'ACCESS DASHBOARD';
+      }
+    }
+  </script>
+</body>
+</html>

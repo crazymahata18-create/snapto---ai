@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapTo AI — Command Dashboard</title>
+  <meta name="description" content="SnapTo AI Command Dashboard — real-time workplace monitoring, AI face recognition, behavior analysis, and automated reporting.">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <style>
+    /* Toggle Switch */
+    .toggle-switch { position:relative; display:inline-block; width:44px; height:22px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0;
+      background:rgba(255,255,255,0.08); border:1px solid var(--border);
+      transition:.3s; border-radius:22px;
+    }
+    .toggle-slider::before {
+      position:absolute; content:''; height:14px; width:14px;
+      left:3px; bottom:3px; background:var(--muted);
+      transition:.3s; border-radius:50%;
+    }
+    input:checked + .toggle-slider { background:rgba(0,255,157,0.2); border-color:var(--green); }
+    input:checked + .toggle-slider::before { transform:translateX(22px); background:var(--green); box-shadow:0 0 8px var(--green); }
+  </style>
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scan Modal -->
+  <div class="scan-modal-overlay" id="scan-modal" style="display:none;" onclick="if(event.target===this)Dashboard.closeScan()">
+    <div class="scan-modal">
+      <div class="scan-modal-header">
+        <div class="scan-modal-title" id="scan-modal-title">AI SCAN</div>
+        <button class="scan-modal-close" onclick="Dashboard.closeScan()">✕</button>
+      </div>
+      <div class="scan-modal-body" id="scan-results">
+        <div class="scan-processing">
+          <div class="scanner-ring"></div>
+          <span>INITIALIZING...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Layout -->
+  <div class="dash-app">
+
+    <!-- Top Bar -->
+    <div class="dash-topbar">
+      <div class="dash-logo"><a href="/">SNAP<span>TO</span> AI</a></div>
+
+      <nav class="dash-nav">
+        <button class="dash-nav-item active" data-view="overview">Overview</button>
+        <button class="dash-nav-item" data-view="cameras">Cameras</button>
+        <button class="dash-nav-item" data-view="customers">Customers</button>
+        <button class="dash-nav-item" data-view="reports">Reports</button>
+        <button class="dash-nav-item" data-view="settings">Settings</button>
+      </nav>
+
+      <div class="dash-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="Search employees..." id="search-input">
+      </div>
+
+      <div class="dash-topbar-right">
+        <button class="notification-btn" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <div class="notification-badge" id="notif-badge" style="display:none;"></div>
+        </button>
+        <div class="dash-clock" id="dash-clock">--:--:--</div>
+        <div class="dash-user" onclick="Dashboard.logout()" title="Logout">
+          <div class="dash-user-avatar" id="user-avatar">DS</div>
+          <div class="dash-user-name" id="user-name">Director Sharma</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left Sidebar -->
+    <div class="dash-sidebar">
+      <div class="sidebar-title">Active Employees</div>
+      <div id="employee-list">
+        <div class="loader">LOADING</div>
+      </div>
+
+      <div class="sidebar-stats">
+        <div class="metric-card" style="margin-bottom:8px;">
+          <div>
+            <div class="metric-label">Online</div>
+            <div class="metric-value" style="color:var(--green);font-size:1.2rem;" id="metric-online">--</div>
+          </div>
+          <span style="font-size:1.4rem;">👥</span>
+        </div>
+        <div class="metric-card">
+          <div>
+            <div class="metric-label">On Break</div>
+            <div class="metric-value" style="color:var(--amber);font-size:1.2rem;" id="metric-break">--</div>
+          </div>
+          <span style="font-size:1.4rem;">☕</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dash-main" id="view-overview">
+      <!-- Camera Grid -->
+      <div id="camera-grid" class="camera-grid">
+        <div class="loader" style="grid-column:1/-1;">CONNECTING TO FEEDS</div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div>
+            <div class="metric-label">Productivity</div>
+            <div class="metric-value" style="color:var(--green);" id="metric-productivity">--%</div>
+          </div>
+          <span style="font-size:1.8rem;">📈</span>
+        </div>
+        <div class="metric-card">
+          <div>
+            <div class="metric-label">Alerts Today</div>
+            <div class="metric-value" style="color:var(--red);" id="metric-alerts">--</div>
+          </div>
+          <span style="font-size:1.8rem;">🚨</span>
+        </div>
+        <div class="metric-card">
+          <div>
+            <div class="metric-label">Avg. Work Time</div>
+            <div class="metric-value" style="color:var(--cyan);" id="metric-worktime">--</div>
+          </div>
+          <span style="font-size:1.8rem;">⏱️</span>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-container">
+        <div class="chart-title">// HOURLY ACTIVITY — TODAY</div>
+        <div class="chart-bars" id="chart-bars">
+          <div class="loader">LOADING CHART</div>
+        </div>
+      </div>
+
+      <!-- Floor Plan -->
+      <div class="floor-plan-container">
+        <div class="chart-title">// FLOOR PLAN — LIVE POSITIONS</div>
+        <div class="floor-plan" id="floor-plan">
+          <div class="loader">MAPPING POSITIONS</div>
+        </div>
+      </div>
+
+      <!-- Report Button -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-sm" onclick="Dashboard.generateDailyReport()">📄 Generate Daily Report</button>
+        <button class="btn-sm" onclick="location.href='/'">← Back to Home</button>
+      </div>
+    </div>
+
+    <!-- Customers View -->
+    <div class="dash-main" id="view-customers" style="display:none; overflow-y: auto;">
+      <div class="chart-container" style="margin-bottom:20px;">
+        <div class="chart-title">// PRIORITY WAITLIST (LEADS)</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:0.7rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); color:var(--cyan); text-align:left;">
+                <th style="padding:10px;">ID</th>
+                <th style="padding:10px;">Email</th>
+                <th style="padding:10px;">Status</th>
+                <th style="padding:10px;">Date Joined</th>
+              </tr>
+            </thead>
+            <tbody id="leads-table-body">
+              <tr><td colspan="4" style="padding:10px; color:var(--muted);">Loading leads...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-title">// SCHEDULED MEETINGS</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:0.7rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); color:var(--green); text-align:left;">
+                <th style="padding:10px;">Date & Time</th>
+                <th style="padding:10px;">Name</th>
+                <th style="padding:10px;">Company</th>
+                <th style="padding:10px;">Email</th>
+              </tr>
+            </thead>
+            <tbody id="meetings-table-body">
+              <tr><td colspan="4" style="padding:10px; color:var(--muted);">Loading meetings...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings View -->
+    <div class="dash-main" id="view-settings" style="display:none; overflow-y: auto; padding: 24px;">
+
+      <div style="font-family:var(--font-display); font-size:1rem; color:var(--cyan); letter-spacing:3px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+        <span style="opacity:0.5;">// </span>SYSTEM SETTINGS
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; max-width:900px;">
+
+        <!-- Account Card -->
+        <div class="chart-container" style="grid-column: span 2;">
+          <div class="chart-title">// LOGGED IN ACCOUNT</div>
+          <div style="display:flex; align-items:center; gap:20px; padding:20px 0; flex-wrap:wrap;">
+            <div id="settings-avatar" style="width:64px; height:64px; border-radius:50%; background:rgba(0,229,255,0.15); border:2px solid var(--cyan); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:1.4rem; font-weight:900; color:var(--cyan); flex-shrink:0;">DS</div>
+            <div>
+              <div id="settings-name" style="font-family:var(--font-display); font-size:1rem; color:var(--white); letter-spacing:1px; margin-bottom:4px;">Director Sharma</div>
+              <div id="settings-username" style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); letter-spacing:1px; margin-bottom:6px;">@admin</div>
+              <div id="settings-role" style="display:inline-block; font-family:var(--font-mono); font-size:0.6rem; color:var(--green); border:1px solid rgba(0,255,157,0.3); background:rgba(0,255,157,0.08); padding:2px 10px; letter-spacing:2px;">ADMIN</div>
+            </div>
+            <div style="margin-left:auto; text-align:right;">
+              <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted); line-height:2;">
+                <div>Session Active ✅</div>
+                <div style="color:var(--cyan);" id="settings-session-time">Active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="chart-container">
+          <div class="chart-title">// CHANGE PASSWORD</div>
+          <div style="display:flex; flex-direction:column; gap:12px; padding-top:12px;">
+            <div>
+              <label style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted); letter-spacing:1px; display:block; margin-bottom:4px;">CURRENT PASSWORD</label>
+              <input type="password" id="settings-current-pw" placeholder="Enter current password" class="input-field" style="width:100%;">
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted); letter-spacing:1px; display:block; margin-bottom:4px;">NEW PASSWORD</label>
+              <input type="password" id="settings-new-pw" placeholder="Enter new password" class="input-field" style="width:100%;">
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted); letter-spacing:1px; display:block; margin-bottom:4px;">CONFIRM NEW PASSWORD</label>
+              <input type="password" id="settings-confirm-pw" placeholder="Confirm new password" class="input-field" style="width:100%;">
+            </div>
+            <div id="settings-pw-msg" style="font-family:var(--font-mono); font-size:0.62rem; display:none; padding:6px 10px;"></div>
+            <button class="btn-sm" onclick="Dashboard.changePassword()" style="align-self:flex-start; margin-top:4px;">🔒 Update Password</button>
+          </div>
+        </div>
+
+        <!-- System Preferences -->
+        <div class="chart-container">
+          <div class="chart-title">// SYSTEM PREFERENCES</div>
+          <div style="display:flex; flex-direction:column; padding-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--white);">Real-Time Alerts</div>
+                <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); margin-top:2px;">WebSocket live feed</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="toggle-alerts" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--white);">Sound Notifications</div>
+                <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); margin-top:2px;">Play sound on danger alerts</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="toggle-sound"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--white);">Auto-Refresh Data</div>
+                <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); margin-top:2px;">Refresh every 10 seconds</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="toggle-refresh" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
+              <div>
+                <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--white);">Compact View</div>
+                <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); margin-top:2px;">Dense layout mode</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="toggle-compact"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="chart-container">
+          <div class="chart-title">// SYSTEM INFO</div>
+          <div style="font-family:var(--font-mono); font-size:0.68rem; line-height:2.2; color:var(--muted); padding-top:10px;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.04); padding:4px 0;"><span>Platform</span><span style="color:var(--cyan);">SnapTo AI v1.0</span></div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.04); padding:4px 0;"><span>Backend</span><span style="color:var(--white);">Node.js + Express</span></div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.04); padding:4px 0;"><span>Database</span><span style="color:var(--white);">SQLite</span></div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.04); padding:4px 0;"><span>AI Engine</span><span style="color:var(--green);">● ACTIVE</span></div>
+            <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>WebSocket</span><span style="color:var(--green);">● CONNECTED</span></div>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="chart-container">
+          <div class="chart-title">// QUICK LINKS</div>
+          <div style="display:flex; flex-direction:column; gap:8px; padding-top:12px;">
+            <a href="/" style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-decoration:none; padding:10px 14px; border:1px solid var(--border); background:rgba(255,255,255,0.02); display:flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🌐 Back to Main Website</a>
+            <a href="/login.html" style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-decoration:none; padding:10px 14px; border:1px solid var(--border); background:rgba(255,255,255,0.02); display:flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🔑 Login / Switch Account</a>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="chart-container" style="grid-column: span 2; border-color: rgba(255,45,85,0.3); background: rgba(255,45,85,0.03);">
+          <div class="chart-title" style="color:var(--red);">// LOG OUT</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 0; flex-wrap:wrap; gap:16px;">
+            <div>
+              <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--white); margin-bottom:6px;">Sign out of SnapTo AI Dashboard</div>
+              <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted);">You will be redirected to the login page. Your session will end securely.</div>
+            </div>
+            <button onclick="Dashboard.logout()" style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:14px 32px; border:1px solid rgba(255,45,85,0.6); background:rgba(255,45,85,0.15); color:var(--red); cursor:pointer; transition:all 0.25s; flex-shrink:0; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);" onmouseover="this.style.background='rgba(255,45,85,0.3)';this.style.boxShadow='0 0 20px rgba(255,45,85,0.3)'" onmouseout="this.style.background='rgba(255,45,85,0.15)';this.style.boxShadow='none'">🚪 LOG OUT</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="dash-right">
+      <div class="sidebar-title">Live Alerts</div>
+      <div class="alerts-list" id="alerts-list">
+        <div class="loader">LOADING ALERTS</div>
+      </div>
+
+      <div class="recent-reports">
+        <div class="sidebar-title">Recent Reports Sent</div>
+        <div id="reports-list">
+          <div class="loader">LOADING</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/api-client.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ai-visualizer.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

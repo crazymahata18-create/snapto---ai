@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapTo AI — User Portal</title>
+  <meta name="description" content="SnapTo AI User Portal — Sign in or create your account to access the SnapTo AI platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050a0f;
+      --surface: #0b1420;
+      --surface2: #0f1c2e;
+      --border: rgba(0,229,255,0.12);
+      --cyan: #00e5ff;
+      --green: #00ff9d;
+      --red: #ff2d55;
+      --amber: #ffb800;
+      --white: #e8f4ff;
+      --muted: #4a6078;
+      --font-display: 'Rajdhani', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-body: 'Inter', sans-serif;
+      --glow-cyan: 0 0 20px rgba(0,229,255,0.4);
+      --glow-green: 0 0 20px rgba(0,255,157,0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(0,229,255,0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0,255,157,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(0,229,255,0.02) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      animation: gridScroll 30s linear infinite;
+    }
+    @keyframes gridScroll { from { background-position: 0 0; } to { background-position: 50px 50px; } }
+
+    /* Top bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(5,10,15,0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      z-index: 100;
+    }
+    .top-logo {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      text-decoration: none;
+      text-shadow: 0 0 15px rgba(0,229,255,0.4);
+    }
+    .top-logo span { color: var(--green); }
+    .top-back {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    .top-back:hover { color: var(--cyan); }
+
+    /* Portal container */
+    .portal-wrap {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      margin-top: 56px;
+    }
+
+    /* Corner decoration */
+    .portal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.7),
+        0 0 50px rgba(0,229,255,0.06),
+        inset 0 1px 0 rgba(0,229,255,0.08);
+      position: relative;
+      padding: 0;
+      overflow: hidden;
+    }
+    .portal-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.6;
+    }
+    .corner { position: absolute; width: 16px; height: 16px; }
+    .corner.tl { top: -1px; left: -1px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+    .corner.tr { top: -1px; right: -1px; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+    .corner.bl { bottom: -1px; left: -1px; border-bottom: 2px solid var(--green); border-left: 2px solid var(--green); }
+    .corner.br { bottom: -1px; right: -1px; border-bottom: 2px solid var(--green); border-right: 2px solid var(--green); }
+
+    /* Header */
+    .portal-header {
+      padding: 32px 36px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .portal-logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--cyan);
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px rgba(0,229,255,0.5);
+      margin-bottom: 4px;
+    }
+    .portal-logo span { color: var(--green); }
+    .portal-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* Tab switcher */
+    .portal-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .portal-tab {
+      flex: 1;
+      padding: 14px;
+      background: none;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+    }
+    .portal-tab.active {
+      color: var(--cyan);
+      background: rgba(0,229,255,0.04);
+    }
+    .portal-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+    .portal-tab:hover:not(.active) { color: var(--white); background: rgba(255,255,255,0.03); }
+
+    /* Form body */
+    .portal-body { padding: 28px 36px 32px; }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,229,255,0.15);
+      color: var(--white);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      padding: 11px 14px;
+      outline: none;
+      transition: all 0.25s;
+    }
+    .form-input::placeholder { color: var(--muted); }
+    .form-input:focus {
+      border-color: var(--cyan);
+      background: rgba(0,229,255,0.04);
+      box-shadow: 0 0 0 1px rgba(0,229,255,0.1);
+    }
+
+    .form-btn {
+      width: 100%;
+      padding: 14px;
+      background: rgba(0,229,255,0.12);
+      border: 1px solid rgba(0,229,255,0.5);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      margin-top: 8px;
+    }
+    .form-btn:hover:not(:disabled) {
+      background: rgba(0,229,255,0.22);
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-1px);
+    }
+    .form-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .form-btn.green {
+      background: rgba(0,255,157,0.12);
+      border-color: rgba(0,255,157,0.5);
+      color: var(--green);
+    }
+    .form-btn.green:hover:not(:disabled) { background: rgba(0,255,157,0.22); box-shadow: var(--glow-green); }
+    .form-btn.red {
+      background: rgba(255,45,85,0.1);
+      border-color: rgba(255,45,85,0.5);
+      color: var(--red);
+    }
+    .form-btn.red:hover:not(:disabled) { background: rgba(255,45,85,0.22); box-shadow: 0 0 20px rgba(255,45,85,0.3); }
+
+    /* Message box */
+    .form-msg {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 8px 12px;
+      margin-top: 12px;
+      display: none;
+      line-height: 1.5;
+    }
+    .form-msg.error { background: rgba(255,45,85,0.1); border: 1px solid rgba(255,45,85,0.3); color: var(--red); }
+    .form-msg.success { background: rgba(0,255,157,0.08); border: 1px solid rgba(0,255,157,0.3); color: var(--green); }
+
+    /* Profile view */
+    .profile-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(0,229,255,0.1);
+      border: 2px solid var(--cyan);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.8rem; font-weight: 900;
+      color: var(--cyan);
+      margin: 0 auto 16px;
+      box-shadow: 0 0 30px rgba(0,229,255,0.2);
+    }
+    .profile-name {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .profile-username {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .profile-role {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 2px;
+      padding: 3px 12px;
+      border-radius: 2px;
+      margin: 0 auto 20px;
+      display: flex; justify-content: center;
+    }
+    .profile-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .profile-info-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+    }
+    .profile-info-label {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .profile-info-value {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+    .profile-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+    .portal-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .portal-footer a { color: var(--cyan); text-decoration: none; }
+    .portal-footer a:hover { text-shadow: var(--glow-cyan); }
+
+    /* Status indicator */
+    .status-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="/" class="top-logo">SNAP<span>TO</span> AI</a>
+    <a href="/" class="top-back">← Back to Home</a>
+  </div>
+
+  <div class="portal-wrap">
+    <div class="portal-card">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+
+      <!-- Header -->
+      <div class="portal-header">
+        <div class="portal-logo">SNAP<span>TO</span> AI</div>
+        <div class="portal-subtitle">User Portal</div>
+      </div>
+
+      <!-- Tabs (Login / Register) -->
+      <div class="portal-tabs" id="auth-tabs">
+        <button class="portal-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="portal-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Body -->
+      <div class="portal-body">
+
+        <!-- ── LOGIN FORM ── -->
+        <div class="form-section active" id="section-login">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" id="login-username" class="form-input" placeholder="Enter your username" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
+          </div>
+          <button class="form-btn" id="login-btn" onclick="doLogin()">Sign In →</button>
+          <div class="form-msg" id="login-msg"></div>
+
+          <div class="portal-footer" style="margin-top:16px;">
+            Don't have an account?
+            <a href="#" onclick="switchTab('register')">Register here</a>
+          </div>
+        </div>
+
+        <!-- ── REGISTER FORM ── -->
+        <div class="form-section" id="section-register">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="reg-name" class="form-input" placeholder="Enter your full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" id="reg-username" class="form-input" placeholder="Choose a username" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="reg-password" class="form-input" placeholder="Min 6 characters" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-input" placeholder="Repeat your password" autocomplete="new-password">
+          </div>
+          <button class="form-btn green" id="register-btn" onclick="doRegister()">Create Account →</button>
+          <div class="form-msg" id="register-msg"></div>
+
+          <div class="portal-footer" style="margin-top:16px;">
+            Already have an account?
+            <a href="#" onclick="switchTab('login')">Sign in here</a>
+          </div>
+        </div>
+
+        <!-- ── PROFILE VIEW (shown when logged in) ── -->
+        <div class="form-section" id="section-profile">
+          <div style="text-align:center; margin-bottom:8px;">
+            <span class="status-dot"></span>
+            <span style="font-family:var(--font-mono); font-size:0.62rem; color:var(--green); letter-spacing:1px;">SESSION ACTIVE</span>
+          </div>
+
+          <div class="profile-avatar" id="profile-avatar">DS</div>
+          <div class="profile-name" id="profile-name">Director Sharma</div>
+          <div class="profile-username" id="profile-username">@admin</div>
+          <div style="display:flex; justify-content:center; margin-bottom:20px;">
+            <div id="profile-role" style="font-family:var(--font-mono); font-size:0.6rem; letter-spacing:2px; padding:3px 14px; border-radius:2px; border:1px solid rgba(0,255,157,0.3); background:rgba(0,255,157,0.08); color:var(--green);">VIEWER</div>
+          </div>
+
+          <div class="profile-info-grid">
+            <div class="profile-info-card">
+              <div class="profile-info-label">Account ID</div>
+              <div class="profile-info-value" id="profile-id">—</div>
+            </div>
+            <div class="profile-info-card">
+              <div class="profile-info-label">Role</div>
+              <div class="profile-info-value" id="profile-role-val">—</div>
+            </div>
+            <div class="profile-info-card" style="grid-column:span 2;">
+              <div class="profile-info-label">Logged In Since</div>
+              <div class="profile-info-value" id="profile-since">—</div>
+            </div>
+          </div>
+
+          <div class="profile-divider"></div>
+
+          <button class="form-btn" onclick="goToDashboard()" style="margin-bottom:10px;">📊 Open Dashboard</button>
+          <button class="form-btn red" onclick="doLogout()">🚪 Log Out</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="portal-footer" style="margin-top:16px;">
+      SnapTo AI &nbsp;·&nbsp; <a href="/login.html">Admin Login</a> &nbsp;·&nbsp; <a href="/">Home</a>
+    </div>
+  </div>
+
+  <script src="/js/api-client.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    const loginStart = new Date();
+
+    function switchTab(tab) {
+      document.querySelectorAll('.portal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('section-' + tab).classList.add('active');
+      clearMsgs();
+    }
+
+    function showMsg(id, text, type) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text;
+      el.className = 'form-msg ' + type;
+      el.style.display = 'block';
+    }
+
+    function clearMsgs() {
+      document.querySelectorAll('.form-msg').forEach(m => m.style.display = 'none');
+    }
+
+    function showProfile(user) {
+      // Hide auth tabs
+      document.getElementById('auth-tabs').style.display = 'none';
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-profile').classList.add('active');
+
+      const name = user.name || user.username || 'User';
+      const username = user.username || '';
+      const role = (user.role || 'viewer').toUpperCase();
+      const initials = name.substring(0, 2).toUpperCase();
+
+      document.getElementById('profile-avatar').textContent = initials;
+      document.getElementById('profile-name').textContent = name;
+      document.getElementById('profile-username').textContent = '@' + username;
+      document.getElementById('profile-id').textContent = user.id || '—';
+      document.getElementById('profile-role-val').textContent = role;
+
+      const roleEl = document.getElementById('profile-role');
+      if (role === 'ADMIN') {
+        roleEl.textContent = 'ADMIN';
+        roleEl.style.color = 'var(--green)';
+        roleEl.style.borderColor = 'rgba(0,255,157,0.3)';
+        roleEl.style.background = 'rgba(0,255,157,0.08)';
+      } else {
+        roleEl.textContent = role;
+        roleEl.style.color = 'var(--cyan)';
+        roleEl.style.borderColor = 'rgba(0,229,255,0.3)';
+        roleEl.style.background = 'rgba(0,229,255,0.08)';
+      }
+
+      const now = new Date();
+      document.getElementById('profile-since').textContent =
+        now.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) + ' at ' +
+        now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    }
+
+    async function doLogin() {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('login-btn');
+
+      if (!username || !password) {
+        showMsg('login-msg', '⚠ Please enter username and password.', 'error');
+        return;
+      }
+
+      btn.textContent = 'Signing In...';
+      btn.disabled = true;
+      clearMsgs();
+
+      try {
+        const data = await Auth.login(username, password);
+        btn.textContent = '✓ Signed In!';
+        showMsg('login-msg', '✓ Welcome back, ' + (data.user?.name || username) + '!', 'success');
+        setTimeout(() => showProfile(Auth.getUser()), 600);
+      } catch (err) {
+        showMsg('login-msg', '⚠ ' + (err.message || 'Invalid credentials. Please try again.'), 'error');
+        btn.textContent = 'Sign In →';
+        btn.disabled = false;
+      }
+    }
+
+    async function doRegister() {
+      const name = document.getElementById('reg-name').value.trim();
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const btn = document.getElementById('register-btn');
+
+      if (!name || !username || !password) {
+        showMsg('register-msg', '⚠ Please fill in all fields.', 'error');
+        return;
+      }
+      if (password !== confirm) {
+        showMsg('register-msg', '⚠ Passwords do not match.', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        showMsg('register-msg', '⚠ Password must be at least 6 characters.', 'error');
+        return;
+      }
+      if (username.length < 3) {
+        showMsg('register-msg', '⚠ Username must be at least 3 characters.', 'error');
+        return;
+      }
+
+      btn.textContent = 'Creating Account...';
+      btn.disabled = true;
+      clearMsgs();
+
+      try {
+        const data = await Auth.register(username, password, name);
+        btn.textContent = '✓ Account Created!';
+        showMsg('register-msg', '✓ Account created successfully! Welcome, ' + name + '!', 'success');
+        setTimeout(() => showProfile(Auth.getUser()), 800);
+      } catch (err) {
+        showMsg('register-msg', '⚠ ' + (err.message || 'Registration failed. Please try again.'), 'error');
+        btn.textContent = 'Create Account →';
+        btn.disabled = false;
+      }
+    }
+
+    function doLogout() {
+      Auth.logout();
+      // Auth.logout redirects to /login.html, so redirect to portal instead
+      localStorage.removeItem('snapto_token');
+      localStorage.removeItem('snapto_user');
+      window.location.href = '/portal.html';
+    }
+
+    function goToDashboard() {
+      window.location.href = '/dashboard.html';
+    }
+
+    // On page load — check if already logged in
+    window.addEventListener('load', () => {
+      if (Auth.isLoggedIn()) {
+        const user = Auth.getUser();
+        if (user) showProfile(user);
+      }
+    });
+
+    // Enter key support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const activeSection = document.querySelector('.form-section.active');
+        if (activeSection?.id === 'section-login') doLogin();
+        else if (activeSection?.id === 'section-register') doRegister();
+      }
+    });
+  </script>
+</body>
+</html>

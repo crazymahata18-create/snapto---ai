@@ -1,0 +1,207 @@
+/* ═══════════════════════════════════════════════════════
+   SnapTo AI — Design System
+   Core tokens, typography, and shared utilities
+   ═══════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  /* Colors */
+  --bg: #020608;
+  --bg2: #050d12;
+  --surface: #0a1a22;
+  --surface2: #0f2230;
+  --cyan: #00e5ff;
+  --cyan2: #00bcd4;
+  --green: #00ff9d;
+  --red: #ff2d55;
+  --amber: #ffb800;
+  --purple: #7c4dff;
+  --white: #e8f4f8;
+  --muted: #5a7d8a;
+  --border: rgba(0, 229, 255, 0.15);
+
+  /* Effects */
+  --glow: 0 0 40px rgba(0, 229, 255, 0.3);
+  --glow-green: 0 0 30px rgba(0, 255, 157, 0.4);
+  --glow-red: 0 0 30px rgba(255, 45, 85, 0.4);
+  --glass-bg: rgba(10, 26, 34, 0.4);
+  --glass-border: rgba(0, 229, 255, 0.2);
+
+  /* Typography */
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 60px;
+  --space-3xl: 100px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* Links */
+a { color: inherit; text-decoration: none; }
+
+/* ─── Shared Animations ──────────────────────────────────────────── */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scanH {
+  0% { top: 0%; opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.3; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes gridMove {
+  from { transform: translateY(0); }
+  to { transform: translateY(60px); }
+}
+
+@keyframes corePulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.3); }
+  50% { box-shadow: 0 0 60px rgba(0, 229, 255, 0.6), 0 0 100px rgba(0, 229, 255, 0.2); }
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes alertPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.7; }
+}
+
+@keyframes barGrow {
+  from { transform: scaleY(0); transform-origin: bottom; }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ─── Utility Classes ────────────────────────────────────────────── */
+
+.text-cyan { color: var(--cyan); }
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.text-amber { color: var(--amber); }
+.text-muted { color: var(--muted); }
+.text-mono { font-family: var(--font-mono); }
+.text-display { font-family: var(--font-display); }
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+}
+
+.glow-cyan { box-shadow: var(--glow); }
+.glow-green { box-shadow: var(--glow-green); }
+.glow-red { box-shadow: var(--glow-red); }
+
+/* Loading Shimmer */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Hidden */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
