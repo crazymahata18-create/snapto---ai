@@ -72,7 +72,7 @@ class BehaviorAnalysis {
         employeeId: employee.id,
         employeeName: employee.name,
         confidence: event.confidence,
-        description: `${employee.name} (${employee.id}) idle for ${idleMinutes} minutes at ${camera.location}`,
+        description: `Efficiency Gap: ${employee.name} zone underutilized for ${idleMinutes} minutes — ${camera.location}`,
         zone: camera.zone
       });
     }
@@ -87,7 +87,7 @@ class BehaviorAnalysis {
         employeeId: employee.id,
         employeeName: employee.name,
         confidence: event.confidence,
-        description: `Heated argument detected between ${employee.name} & ${emp2.name} — ${camera.location}`,
+        description: `Interpersonal safety protocol: Unusual interaction detected between ${employee.name} & ${emp2.name} — ${camera.location}`,
         zone: camera.zone
       });
     }
@@ -101,7 +101,7 @@ class BehaviorAnalysis {
         employeeId: employee.id,
         employeeName: employee.name,
         confidence: event.confidence,
-        description: `Safety protocol violation detected — ${employee.name} at ${camera.location}`,
+        description: `Workplace hazard mitigation: Safety protocol anomaly — ${employee.name} at ${camera.location}`,
         zone: camera.zone
       });
     }
@@ -115,7 +115,7 @@ class BehaviorAnalysis {
         employeeId: employee.id,
         employeeName: employee.name,
         confidence: event.confidence,
-        description: `Unauthorized access: ${employee.name} entered restricted zone — ${camera.location}`,
+        description: `Operational integrity check: Entry into restricted zone ${camera.location} — ${employee.name}`,
         zone: camera.zone
       });
     }

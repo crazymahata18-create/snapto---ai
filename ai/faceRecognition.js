@@ -60,7 +60,7 @@ class FaceRecognition {
         cameraId: camera.id,
         cameraLabel: camera.label,
         confidence: detection.confidence,
-        description: `Unknown face detected on ${camera.label} — Confidence: ${detection.confidence}%`,
+        description: `Unrecognized individual identification required — ${camera.label}`,
         zone: camera.zone
       });
     } else {
@@ -89,7 +89,7 @@ class FaceRecognition {
           employeeId: employee.id,
           employeeName: employee.name,
           confidence: detection.confidence,
-          description: `${employee.name} (${employee.id}) verified at ${camera.location}`,
+          description: `Identity verified for operational clearance: ${employee.name} — ${camera.location}`,
           zone: camera.zone
         });
       }

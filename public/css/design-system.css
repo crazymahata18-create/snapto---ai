@@ -196,12 +196,52 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--radius-sm);
 }
 
-/* Hidden */
-.sr-only {
+/* ─── AI Visuals ───────────────────────────────────────────────── */
+
+.ai-zone-glow {
   position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+  background: rgba(0, 229, 255, 0.03);
+  border: 1px dashed rgba(0, 229, 255, 0.3);
+  pointer-events: none;
+  animation: fadeIn 2s ease-in-out infinite alternate;
+}
+
+.ai-scan-trail {
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 229, 255, 0.1), transparent);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.compliance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(0, 255, 157, 0.05);
+  border: 1px solid rgba(0, 255, 157, 0.2);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.compliance-badge::before {
+  content: '✓';
+  font-weight: bold;
+}
+
+.privacy-card {
+  border-left: 3px solid var(--cyan);
+  padding: 20px;
+  background: rgba(0, 229, 255, 0.02);
+  transition: all 0.3s;
+}
+
+.privacy-card:hover {
+  background: rgba(0, 229, 255, 0.05);
+  transform: translateX(5px);
 }
