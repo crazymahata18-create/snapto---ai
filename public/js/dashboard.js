@@ -316,16 +316,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ─── Bind globals for inline handlers ───────────────────
-  window.Dashboard = {
-    logout: Auth.logout,
-    generateDailyReport,
-    scanCamera,
-    changePassword: Dashboard.changePassword,
-    toggleNotifications: Dashboard.toggleNotifications,
-    savePreference: function(key, value) {
-      localStorage.setItem('snapto_pref_' + key, value);
-    }
+  Dashboard.generateDailyReport = generateDailyReport;
+  Dashboard.savePreference = function(key, value) {
+    localStorage.setItem('snapto_pref_' + key, value);
   };
+
+  // Specifically ensure logout is bound correctly
+  Dashboard.logout = Auth.logout;
+  
+  // Assign the local Dashboard object to window
+  window.Dashboard = Dashboard;
 
   // ─── Scan Camera ─────────────────────────────────────────
   window.Dashboard = window.Dashboard || {};
@@ -619,4 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Dashboard.logout = function() {
     Auth.logout();
   };
+  
+  // Final global assignment
+  window.Dashboard = Dashboard;
 });
