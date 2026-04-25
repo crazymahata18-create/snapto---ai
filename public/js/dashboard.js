@@ -183,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (viewId === 'settings') {
         document.getElementById('view-settings').style.display = 'block';
         loadSettingsView();
+      } else if (viewId === 'tracker') {
+        document.getElementById('view-tracker').style.display = 'block';
       } else {
         // Fallback for unimplemented tabs
         document.getElementById('view-overview').style.display = 'flex';

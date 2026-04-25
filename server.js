@@ -20,6 +20,7 @@ const cameraRoutes = require('./api/routes/cameras');
 const reportRoutes = require('./api/routes/reports');
 const publicRoutes = require('./api/routes/public');
 const adminRoutes = require('./api/routes/admin');
+const trackerRoutes = require('./api/routes/tracker');
 const { getDb } = require('./api/db/database');
 
 // Import AI engines
@@ -124,6 +125,7 @@ app.use('/api/cameras', cameraRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/tracker', trackerRoutes);
 
 // API health check
 app.get('/api/health', (req, res) => {
@@ -173,6 +175,7 @@ server.listen(PORT, async () => {
   console.log('  ╠══════════════════════════════════════════════════╣');
   console.log(`  ║  🌐 http://localhost:${PORT}                       ║`);
   console.log(`  ║  📊 http://localhost:${PORT}/dashboard.html        ║`);
+  console.log(`  ║  📚 http://localhost:${PORT}/study-tracker.html    ║`);
   console.log(`  ║  🔑 http://localhost:${PORT}/login.html            ║`);
   console.log(`  ║  🔌 ws://localhost:${PORT}/ws                      ║`);
   console.log(`  ║  📡 http://localhost:${PORT}/api/health             ║`);

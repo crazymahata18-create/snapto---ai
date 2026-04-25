@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapTo AI — Study Tracker | Real-Time Focus Monitor</title>
+  <meta name="description" content="Real-time AI-powered study and screen-time tracker. Uses your camera to detect focus, distraction, and away time with live analytics and Pomodoro timer.">
+
+  <!-- Fonts & Design System -->
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/study-tracker.css">
+
+  <!-- face-api.js (vladmandic fork — models served from same CDN) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  <!-- Tracker Logic -->
+  <script defer src="/js/study-tracker.js"></script>
+</head>
+<body>
+<div class="tracker-app">
+
+  <!-- ─── Top Bar ──────────────────────────────────────────────────────── -->
+  <div class="tracker-topbar">
+    <div>
+      <div class="tracker-logo">SNAP<span>TO</span> AI</div>
+      <div class="tracker-logo-sub">STUDY TRACKER — AI FOCUS MONITOR</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="live-badge">
+        <div class="live-dot" id="status-dot"></div>
+        <span id="live-text" style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:2px;">INITIALIZING</span>
+      </div>
+      <a href="/dashboard.html" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);letter-spacing:1px;border:1px solid var(--border);padding:7px 14px;transition:all 0.2s;" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">← DASHBOARD</a>
+      <a href="/" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);letter-spacing:1px;border:1px solid var(--border);padding:7px 14px;transition:all 0.2s;" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">⌂ HOME</a>
+    </div>
+  </div>
+
+  <!-- ─── Main Grid ─────────────────────────────────────────────────────── -->
+  <div class="tracker-main">
+
+    <!-- ── LEFT: Camera Feed ─────────────────────────────────────────── -->
+    <div class="camera-panel">
+      <div class="panel-header">
+        <div class="panel-title"><span>//</span> LIVE CAMERA FEED</div>
+        <div id="fps-counter" class="fps-counter">face-api.js v0.22</div>
+      </div>
+
+      <div class="camera-wrapper">
+        <!-- Video + Canvas -->
+        <video id="tracker-video" autoplay muted playsinline></video>
+        <canvas id="tracker-canvas"></canvas>
+
+        <!-- Cyberpunk overlays -->
+        <div class="camera-overlay-grid"></div>
+        <div class="camera-scan-line"></div>
+        <div class="camera-corner tl"></div>
+        <div class="camera-corner tr"></div>
+        <div class="camera-corner bl"></div>
+        <div class="camera-corner br"></div>
+
+        <!-- No-camera placeholder -->
+        <div class="camera-placeholder" id="camera-placeholder">
+          <div class="camera-placeholder-icon">📷</div>
+          <p>CAMERA OFFLINE<br><br>Load AI models then click<br><strong style="color:var(--green)">▶ START TRACKING</strong><br>to activate your camera</p>
+        </div>
+
+        <!-- Status overlay on video -->
+        <div class="face-status-overlay loading" id="face-status-overlay">⟳ LOADING AI MODELS...</div>
+      </div>
+
+      <!-- Controls -->
+      <div class="camera-controls">
+        <button class="ctrl-btn start" id="btn-start" disabled onclick="StudyTracker.start()">▶ START</button>
+        <button class="ctrl-btn stop" id="btn-stop" disabled onclick="StudyTracker.stop()">■ PAUSE</button>
+        <button class="ctrl-btn reset" onclick="StudyTracker.reset()">↺ RESET</button>
+        <button class="ctrl-btn reset" onclick="StudyTracker.openSettings()" style="margin-left:auto;">⚙ SETTINGS</button>
+      </div>
+
+      <!-- Activity Log -->
+      <div style="padding:14px 18px;border-top:1px solid var(--border);">
+        <div class="panel-title" style="margin-bottom:10px;"><span>//</span> ACTIVITY LOG</div>
+        <div id="tracker-log" style="max-height:80px;overflow:hidden;"></div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Stats ───────────────────────────────────────────────── -->
+    <div class="stats-panel">
+
+      <!-- Status Card -->
+      <div class="status-card loading" id="status-card">
+        <div class="status-label">// CURRENT STATUS</div>
+        <div class="status-value loading" id="status-value">⟳ LOADING</div>
+        <div class="status-sub" id="status-sub">Initializing AI models...</div>
+
+        <!-- Score Ring -->
+        <div class="score-ring-wrap">
+          <div class="ring-svg-wrapper">
+            <svg class="ring-svg" viewBox="0 0 90 90">
+              <circle class="ring-track" cx="45" cy="45" r="36"/>
+              <circle class="ring-progress" id="ring-progress" cx="45" cy="45" r="36"/>
+            </svg>
+            <div class="ring-center-text">
+              <div class="ring-pct" id="ring-pct">0%</div>
+              <div class="ring-label">STUDY</div>
+            </div>
+          </div>
+
+          <div class="score-breakdown">
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-dot" style="background:var(--green)"></div>
+              <div class="score-breakdown-name">Study</div>
+              <div class="score-breakdown-val" id="score-study-val">00:00:00</div>
+            </div>
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-dot" style="background:var(--amber)"></div>
+              <div class="score-breakdown-name">Distracted</div>
+              <div class="score-breakdown-val" id="score-distracted-val">00:00:00</div>
+            </div>
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-dot" style="background:var(--red)"></div>
+              <div class="score-breakdown-name">Away</div>
+              <div class="score-breakdown-val" id="score-away-val">00:00:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timer Grid -->
+      <div class="timer-grid">
+        <div class="panel-title"><span>//</span> SESSION TIMERS</div>
+        <div class="timer-items">
+
+          <div class="timer-item" id="item-session">
+            <div class="timer-item-icon">🕐</div>
+            <div class="timer-item-label">SESSION</div>
+            <div class="timer-item-value session" id="timer-session">00:00:00</div>
+            <div class="timer-bar" style="background:var(--cyan);width:100%;"></div>
+          </div>
+
+          <div class="timer-item" id="item-study">
+            <div class="timer-item-icon">📚</div>
+            <div class="timer-item-label">STUDY</div>
+            <div class="timer-item-value study" id="timer-study">00:00:00</div>
+            <div class="timer-bar study" id="bar-study" style="width:0%"></div>
+          </div>
+
+          <div class="timer-item" id="item-distracted">
+            <div class="timer-item-icon">🔀</div>
+            <div class="timer-item-label">DISTRACTED</div>
+            <div class="timer-item-value distracted" id="timer-distracted">00:00:00</div>
+            <div class="timer-bar distracted" id="bar-distracted" style="width:0%"></div>
+          </div>
+
+          <div class="timer-item" id="item-away">
+            <div class="timer-item-icon">💤</div>
+            <div class="timer-item-label">AWAY</div>
+            <div class="timer-item-value away" id="timer-away">00:00:00</div>
+            <div class="timer-bar away" id="bar-away" style="width:0%"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Pomodoro Card -->
+      <div class="pomodoro-card">
+        <div class="panel-title"><span>//</span> POMODORO TIMER</div>
+        <div class="pomodoro-ring-wrap">
+          <div class="pomo-center">
+            <svg class="pomo-ring-svg" viewBox="0 0 70 70">
+              <circle class="pomo-track" cx="35" cy="35" r="28"/>
+              <circle class="pomo-progress" id="pomo-progress" cx="35" cy="35" r="28"/>
+            </svg>
+            <div class="pomo-center-inner">
+              <div class="pomo-time" id="pomo-time">25:00</div>
+              <div class="pomo-sub">REMAINING</div>
+            </div>
+          </div>
+
+          <div class="pomo-info">
+            <div class="pomo-phase" id="pomo-phase">FOCUS SESSION</div>
+            <div class="pomo-count" id="pomo-count">Completed: 0 / 4 sessions</div>
+            <div class="pomo-dots">
+              <div class="pomo-dot"></div>
+              <div class="pomo-dot"></div>
+              <div class="pomo-dot"></div>
+              <div class="pomo-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /stats-panel -->
+
+    <!-- ── BOTTOM: Hourly Chart ───────────────────────────────────────── -->
+    <div class="chart-panel">
+      <div class="panel-header" style="padding:0 0 12px 0; border:none;">
+        <div class="panel-title"><span>//</span> TODAY'S HOURLY BREAKDOWN</div>
+        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);">Last 8 hours — updates every second</div>
+      </div>
+
+      <div class="hourly-chart" id="hourly-chart">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--green);"></div>
+          Study time
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--amber);"></div>
+          Distracted time
+        </div>
+        <div class="legend-item" style="margin-left:auto;">
+          <span style="color:var(--muted);">Data auto-saves every 30 seconds · Restored daily</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tracker-main -->
+
+</div><!-- /tracker-app -->
+
+<!-- ─── Break Toast ─────────────────────────────────────────────────────── -->
+<div class="break-toast" id="break-toast">
+  <div class="break-toast-title">🍃 BREAK TIME</div>
+  <div class="break-toast-msg" id="break-toast-msg">
+    You've been studying for 25 minutes. Time for a short break!
+  </div>
+  <button class="break-toast-close" onclick="StudyTracker.closeBreakToast()">
+    DISMISS →
+  </button>
+</div>
+
+<!-- ─── Settings Modal ──────────────────────────────────────────────────── -->
+<div class="settings-modal-overlay" id="settings-modal" onclick="if(event.target===this)StudyTracker.closeSettings()">
+  <div class="settings-modal">
+    <div class="settings-modal-title">// TRACKER SETTINGS</div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Detection Sensitivity</div>
+        <div class="settings-row-sub">How strict the gaze detection is</div>
+      </div>
+      <select class="settings-select" id="setting-sensitivity">
+        <option value="low">LOW</option>
+        <option value="medium" selected>MEDIUM</option>
+        <option value="high">HIGH</option>
+      </select>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Focus Session Length</div>
+        <div class="settings-row-sub">Minutes before a break reminder</div>
+      </div>
+      <select class="settings-select" id="setting-pomo">
+        <option value="15">15 min</option>
+        <option value="25" selected>25 min (Pomodoro)</option>
+        <option value="45">45 min</option>
+        <option value="60">60 min</option>
+        <option value="90">90 min</option>
+      </select>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Break Duration</div>
+        <div class="settings-row-sub">Length of break period</div>
+      </div>
+      <select class="settings-select" id="setting-break">
+        <option value="5" selected>5 min</option>
+        <option value="10">10 min</option>
+        <option value="15">15 min</option>
+        <option value="20">20 min</option>
+      </select>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">Break Reminders</div>
+        <div class="settings-row-sub">Show popup when break time arrives</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="setting-reminders" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <button class="settings-modal-close" onclick="StudyTracker.closeSettings()">SAVE & CLOSE</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -74,6 +74,7 @@
         <button class="dash-nav-item" data-view="cameras">Cameras</button>
         <button class="dash-nav-item" data-view="customers">Customers</button>
         <button class="dash-nav-item" data-view="reports">Reports</button>
+        <button class="dash-nav-item" data-view="tracker">📚 Study Tracker</button>
         <button class="dash-nav-item" data-view="settings">Settings</button>
       </nav>
 
@@ -221,7 +222,68 @@
       </div>
     </div>
 
+    <!-- Study Tracker View -->
+    <div class="dash-main" id="view-tracker" style="display:none; overflow-y: auto; padding: 24px;">
+
+      <div style="font-family:var(--font-display); font-size:1rem; color:var(--green); letter-spacing:3px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+        <span style="opacity:0.5;">// </span>📚 STUDY TRACKER — AI FOCUS MONITOR
+      </div>
+
+      <!-- Launch Card -->
+      <div class="chart-container" style="margin-bottom:20px; border-color:rgba(0,255,157,0.25); background:rgba(0,255,157,0.02);">
+        <div class="chart-title" style="color:var(--green);">// REAL-TIME FOCUS TRACKING</div>
+        <div style="display:flex; align-items:center; gap:32px; padding:20px 0; flex-wrap:wrap;">
+          <div style="font-size:4rem;">📷</div>
+          <div style="flex:1;">
+            <div style="font-family:var(--font-display); font-size:1rem; color:var(--white); letter-spacing:2px; margin-bottom:10px;">AI-POWERED STUDY MONITOR</div>
+            <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--muted); line-height:2;">
+              Uses your <span style="color:var(--cyan);">laptop or external webcam</span> with face detection AI to automatically track<br>
+              how much time you spend studying vs. distracted vs. away from your screen.<br><br>
+              ✅ Real-time face detection &amp; gaze estimation<br>
+              ✅ Study / Distracted / Away timers with live counters<br>
+              ✅ Pomodoro focus sessions (25 min study → 5 min break)<br>
+              ✅ Hourly breakdown chart for today<br>
+              ✅ Auto-saves progress locally every 30 seconds
+            </div>
+          </div>
+          <a href="/study-tracker.html" target="_blank" style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:16px 32px; border:1px solid rgba(0,255,157,0.6); background:rgba(0,255,157,0.1); color:var(--green); cursor:pointer; transition:all 0.25s; text-decoration:none; display:inline-block; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); flex-shrink:0;" onmouseover="this.style.background='rgba(0,255,157,0.2)';this.style.boxShadow='0 0 20px rgba(0,255,157,0.3)'" onmouseout="this.style.background='rgba(0,255,157,0.1)';this.style.boxShadow='none'">📚 OPEN TRACKER →</a>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-bottom:20px;">
+        <div class="chart-container" style="text-align:center; padding:20px;">
+          <div style="font-size:2.4rem; margin-bottom:10px;">📷</div>
+          <div style="font-family:var(--font-display); font-size:0.65rem; color:var(--cyan); letter-spacing:2px; margin-bottom:8px;">CAMERA DETECTION</div>
+          <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); line-height:1.8;">Uses face-api.js + TensorFlow.js running entirely in your browser. No data leaves your device.</div>
+        </div>
+        <div class="chart-container" style="text-align:center; padding:20px;">
+          <div style="font-size:2.4rem; margin-bottom:10px;">🧠</div>
+          <div style="font-family:var(--font-display); font-size:0.65rem; color:var(--green); letter-spacing:2px; margin-bottom:8px;">GAZE ESTIMATION</div>
+          <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); line-height:1.8;">68-point face landmarks detect if your eyes are facing the screen. Adjustable sensitivity.</div>
+        </div>
+        <div class="chart-container" style="text-align:center; padding:20px;">
+          <div style="font-size:2.4rem; margin-bottom:10px;">📊</div>
+          <div style="font-family:var(--font-display); font-size:0.65rem; color:var(--amber); letter-spacing:2px; margin-bottom:8px;">ANALYTICS</div>
+          <div style="font-family:var(--font-mono); font-size:0.6rem; color:var(--muted); line-height:1.8;">Live study score, hourly breakdown chart, and Pomodoro session tracking. Data saved daily.</div>
+        </div>
+      </div>
+
+      <!-- Privacy note -->
+      <div class="chart-container" style="border-color:rgba(0,229,255,0.15);">
+        <div class="chart-title">// PRIVACY &amp; SECURITY</div>
+        <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--muted); line-height:2.2; padding-top:10px;">
+          <div>🔒 &nbsp;All AI processing runs <span style="color:var(--green);">100% in your browser</span> — no video is ever uploaded or stored</div>
+          <div>🔒 &nbsp;Camera access is only active while the tracker is running</div>
+          <div>🔒 &nbsp;Session data (time counters) is saved to <span style="color:var(--cyan);">localStorage</span> on your device only</div>
+          <div>🔒 &nbsp;Works with any USB or built-in webcam</div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- Settings View -->
+
     <div class="dash-main" id="view-settings" style="display:none; overflow-y: auto; padding: 24px;">
 
       <div style="font-family:var(--font-display); font-size:1rem; color:var(--cyan); letter-spacing:3px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
