@@ -34,6 +34,19 @@ async function initDb() {
     )
   `);
 
+  // Migration: Add columns to users if they don't exist
+  const tableInfo = await db.all("PRAGMA table_info(users)");
+  const hasLastLogin = tableInfo.some(col => col.name === 'last_login');
+  if (!hasLastLogin) {
+    try {
+      await db.exec('ALTER TABLE users ADD COLUMN last_login DATETIME');
+      await db.exec('ALTER TABLE users ADD COLUMN last_active DATETIME');
+      console.log('[DB] Migrated users table with new columns');
+    } catch (err) {
+      console.error('[DB] Migration error:', err.message);
+    }
+  }
+
   // Leads table (Pre-orders)
   await db.exec(`
     CREATE TABLE IF NOT EXISTS leads (

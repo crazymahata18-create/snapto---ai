@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!Auth.requireAuth()) return;
 
     // Set user info
+    const user = Auth.getUser();
     if (user && userNameEl) {
       userNameEl.textContent = user.name || user.username;
       if (userAvatarEl) userAvatarEl.textContent = (user.name || 'U').substring(0, 2).toUpperCase();
