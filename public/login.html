@@ -223,10 +223,14 @@
       errorEl.style.display = 'none';
 
       try {
-        await Auth.login(username, password);
-        btn.textContent = '✓ ACCESS GRANTED';
-        btn.style.background = 'var(--green)';
-        setTimeout(() => window.location.href = '/dashboard.html', 600);
+        const data = await Auth.login(username, password);
+        if (data && data.success) {
+          btn.textContent = '✓ ACCESS GRANTED';
+          btn.style.background = 'var(--green)';
+          setTimeout(() => window.location.href = '/dashboard.html', 600);
+        } else {
+          throw new Error(data ? data.error : 'Invalid credentials');
+        }
       } catch (err) {
         errorEl.textContent = err.message || 'Invalid credentials';
         errorEl.style.display = 'block';
