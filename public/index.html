@@ -203,64 +203,54 @@
   }
   .hero-title span {
     display: block;
-    line-height: 1;
-    border: none !important;
-    border-left: none !important;
-    padding-left: 0 !important;
-    position: relative;
+    line-height: 1.05;
   }
-  .hero-title span::before, .hero-title span::after,
-  .hero-title .line1::before, .hero-title .line1::after,
-  .hero-title .line2::before, .hero-title .line2::after,
-  .hero-title .line3::before, .hero-title .line3::after {
-    display: none !important;
-    content: none !important;
-    border: none !important;
-    width: 0 !important;
-    height: 0 !important;
+
+  .hero-title .line1 { 
+    color: var(--white); 
+    text-shadow: 0 4px 30px rgba(232, 244, 248, 0.15);
   }
-  .hero-title .line1 { color: var(--white); display: block; text-shadow: 0 0 30px rgba(255,255,255,0.1); }
+
   .hero-title .line2 {
     color: transparent;
     -webkit-text-stroke: 1.5px var(--cyan);
-    display: block;
-    text-shadow: none;
     position: relative;
-    border-left: none !important;
-    padding-left: 0 !important;
+    display: inline-block;
   }
-  .hero-title .line2:hover {
-    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+  
+  .hero-title .line2::after {
+    content: 'WORKPLACE';
+    position: absolute;
+    left: 0;
+    top: 0;
     color: var(--cyan);
+    opacity: 0;
+    filter: blur(12px);
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    pointer-events: none;
   }
-  @keyframes glitch {
-    0% { transform: translate(0) }
-    20% { transform: translate(-2px, 2px) }
-    40% { transform: translate(-2px, -2px) }
-    60% { transform: translate(2px, 2px) }
-    80% { transform: translate(2px, -2px) }
-    100% { transform: translate(0) }
+  
+  .hero-title .line2:hover::after {
+    opacity: 0.5;
   }
 
   .hero-title .line3 {
-    color: var(--cyan);
-    display: block;
-    text-shadow: 0 0 40px rgba(0,229,255,0.5);
-    border: none !important;
-    border-left: none !important;
-    padding-left: 0 !important;
+    background: linear-gradient(90deg, var(--cyan) 0%, var(--green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 25px rgba(0, 229, 255, 0.3));
+    position: relative;
   }
 
   .hero-desc {
-    font-size: 1.1rem;
-    color: rgba(232,244,248,0.8);
-    line-height: 1.75;
-    max-width: 560px;
+    font-size: 1.15rem;
+    color: rgba(232,244,248,0.85);
+    line-height: 1.8;
+    max-width: 580px;
     margin-bottom: 44px;
     animation: fadeInUp 1s 0.2s ease both;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    border-left: none !important;
-    padding-left: 0 !important;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.6);
   }
 
   .hero-btns {
