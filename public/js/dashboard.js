@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let alerts = [];
   let selectedCamera = null;
 
+  // Controller Object
+  const Dashboard = {};
+
   // DOM refs
   const clockEl = document.getElementById('dash-clock');
   const employeeList = document.getElementById('employee-list');
@@ -280,11 +283,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('settings-current-pw').value = '';
         document.getElementById('settings-new-pw').value = '';
         document.getElementById('settings-confirm-pw').value = '';
+        showToast('Password changed successfully', 'ok');
       } else {
         if (msgEl) { msgEl.style.display = 'block'; msgEl.style.color = 'var(--red)'; msgEl.style.background = 'rgba(255,45,85,0.1)'; msgEl.style.border = '1px solid rgba(255,45,85,0.3)'; msgEl.textContent = '⚠ ' + (data.error || 'Failed to update password.'); }
       }
     } catch (err) {
       if (msgEl) { msgEl.style.display = 'block'; msgEl.style.color = 'var(--red)'; msgEl.style.background = 'rgba(255,45,85,0.1)'; msgEl.style.border = '1px solid rgba(255,45,85,0.3)'; msgEl.textContent = '⚠ Network error. Please try again.'; }
+    }
+  };
+
+  // ─── Notifications ───────────────────────────────────────
+  Dashboard.toggleNotifications = function() {
+    const alertsList = document.getElementById('alerts-list');
+    if (alertsList) {
+      // If mobile or compact, we might want a dropdown, but for now let's just highlight it
+      alertsList.parentElement.classList.toggle('highlight');
+      if (notifBadge) notifBadge.style.display = 'none';
+      showToast('Viewing recent live alerts', 'ok');
     }
   };
 
@@ -294,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateDailyReport,
     scanCamera,
     changePassword: Dashboard.changePassword,
+    toggleNotifications: Dashboard.toggleNotifications,
     savePreference: function(key, value) {
       localStorage.setItem('snapto_pref_' + key, value);
     }

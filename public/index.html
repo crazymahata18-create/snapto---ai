@@ -2344,14 +2344,22 @@ async function fetchBookedSlots() {
         });
       });
       if (selectedDate) {
-        selectDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+        const y = selectedDate.getFullYear();
+        const m = selectedDate.getMonth();
+        const d = selectedDate.getDate();
+        // Don't re-render entire calendar, just refresh slots if date is open
+        if (timeSel.style.display === 'block') {
+          renderTimeSlots(y, m, d);
+        }
       }
     }
   } catch (err) {
     console.error('Failed to fetch booked slots', err);
   }
 }
+// Initial fetch and poll every 10s
 fetchBookedSlots();
+setInterval(fetchBookedSlots, 10000);
 
 const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
@@ -2401,13 +2409,38 @@ function selectDate(y, m, d) {
   selectedTime = null;
   
   selDateDisp.textContent = `${monthNames[m]} ${d}, ${y}`;
-  
+  renderTimeSlots(y, m, d);
+}
+
+function renderTimeSlots(y, m, d) {
   timeSlots.innerHTML = '';
   const times = ['09:00 AM', '10:30 AM', '01:00 PM', '02:30 PM', '04:00 PM'];
   const dateKey = `${y}-${m}-${d}`;
   
-  // Only show times that are NOT already booked
-  const availableTimes = times.filter(t => !bookedSlots.includes(`${dateKey}-${t}`));
+  const now = new Date();
+  const isToday = now.getFullYear() === y && now.getMonth() === m && now.getDate() === d;
+  
+  // Filter out: 
+  // 1. Booked slots
+  // 2. Past times if it is today
+  const availableTimes = times.filter(t => {
+    // Check if booked
+    if (bookedSlots.includes(`${dateKey}-${t}`)) return false;
+    
+    // Check if past
+    if (isToday) {
+      const [hourPart, minutePart] = t.split(':');
+      const [minutes, ampm] = minutePart.split(' ');
+      let hour = parseInt(hourPart);
+      if (ampm === 'PM' && hour !== 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      
+      const slotTime = new Date(y, m, d, hour, parseInt(minutes));
+      return slotTime > now;
+    }
+    
+    return true;
+  });
   
   if (availableTimes.length === 0) {
     timeSlots.innerHTML = `<div style="grid-column: span 2; text-align: center; padding: 20px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);">No available slots for this date.<br>Please select another day.</div>`;
