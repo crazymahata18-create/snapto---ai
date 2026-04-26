@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#020608">
 <title>SnapTo AI — Facility Intelligence & Workplace Safety</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -37,6 +38,12 @@
     font-family: 'Syne', sans-serif;
     overflow-x: hidden;
     cursor: none;
+  }
+
+  /* DISABLE CUSTOM CURSOR ON MOBILE */
+  @media (pointer: coarse) {
+    body, .nav-cta, .btn-primary, .btn-secondary, .btn-sm, button, a { cursor: auto !important; }
+    .cursor, .cursor-ring { display: none !important; }
   }
 
   /* CUSTOM CURSOR */
@@ -1219,7 +1226,74 @@
     .step-content { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr; }
     footer { padding: 40px 24px; }
+
+    /* MOBILE NAV MENU */
+    .nav-mobile-toggle {
+      display: flex !important;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      padding: 5px;
+      z-index: 1001;
+    }
+    .nav-mobile-toggle span {
+      width: 24px;
+      height: 2px;
+      background: var(--cyan);
+      transition: all 0.3s ease;
+    }
+    .nav-mobile-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-mobile-toggle.active span:nth-child(2) { opacity: 0; }
+    .nav-mobile-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .nav-mobile-menu {
+      display: flex !important;
+      position: fixed;
+      top: 0; right: -100%;
+      width: 80%;
+      height: 100vh;
+      background: rgba(2, 6, 8, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border);
+      flex-direction: column;
+      padding: 100px 40px;
+      gap: 30px;
+      z-index: 1000;
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-mobile-menu.active { right: 0; }
+    .nav-mobile-menu ul {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      list-style: none;
+    }
+    .nav-mobile-menu ul li a {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .nav-mobile-menu .mobile-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .nav-desktop-btns { display: none !important; }
+
+    /* INPUT ZOOM FIX */
+    input, select, textarea { font-size: 16px !important; }
+    
+    /* STATS STRIP FIX */
+    .stat-item { padding: 20px !important; border-right: none; border-bottom: 1px solid var(--border); }
+    .stat-num { font-size: 1.5rem !important; }
   }
+
 </style>
 </head>
 <body>
@@ -1229,7 +1303,9 @@
 
 <nav id="navbar">
   <div class="nav-logo">SNAP<span>TO</span> AI</div>
-  <ul>
+  
+  <!-- Desktop Links -->
+  <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#how">How It Works</a></li>
     <li><a href="#features">Features</a></li>
@@ -1239,9 +1315,35 @@
     <li><a href="#meeting">Meeting</a></li>
     <li><a href="#team">Team</a></li>
   </ul>
-  <div style="display:flex; gap:10px; align-items:center;">
+
+  <div class="nav-desktop-btns" style="display:flex; gap:10px; align-items:center;">
     <a href="/portal.html" id="nav-portal-btn" style="font-family:var(--font-mono); font-size:0.68rem; letter-spacing:1px; color:var(--cyan); border:1px solid rgba(0,229,255,0.3); padding:8px 16px; text-decoration:none; transition:all 0.25s; background:rgba(0,229,255,0.06);" onmouseover="this.style.background='rgba(0,229,255,0.15)';this.style.boxShadow='0 0 15px rgba(0,229,255,0.2)'" onmouseout="this.style.background='rgba(0,229,255,0.06)';this.style.boxShadow='none'">My Account</a>
     <button class="nav-cta" onclick="window.location.href='/login.html'">Open Dashboard</button>
+  </div>
+
+  <!-- Mobile Toggle -->
+  <button class="nav-mobile-toggle" id="mobileToggle" style="display:none;">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Mobile Drawer -->
+  <div class="nav-mobile-menu" id="mobileMenu" style="display:none;">
+    <ul>
+      <li><a href="#about" onclick="toggleMenu()">About</a></li>
+      <li><a href="#how" onclick="toggleMenu()">How It Works</a></li>
+      <li><a href="#features" onclick="toggleMenu()">Features</a></li>
+      <li><a href="#demo" onclick="toggleMenu()">Dashboard</a></li>
+      <li><a href="#roadmap" onclick="toggleMenu()">Ideas</a></li>
+      <li><a href="#pricing" onclick="toggleMenu()">Pricing</a></li>
+      <li><a href="#meeting" onclick="toggleMenu()">Meeting</a></li>
+      <li><a href="#team" onclick="toggleMenu()">Team</a></li>
+    </ul>
+    <div class="mobile-btns">
+      <a href="/portal.html" class="btn-secondary" style="text-align:center; padding: 12px;">My Account</a>
+      <button class="btn-primary" onclick="window.location.href='/login.html'">Open Dashboard</button>
+    </div>
   </div>
 </nav>
 
@@ -2623,6 +2725,20 @@ async function handlePreorder(e) {
   // Show success screen always
   e.target.style.display = 'none';
   document.getElementById('preorder-success').style.display = 'block';
+}
+
+// MOBILE MENU LOGIC
+const mobileToggle = document.getElementById('mobileToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+
+function toggleMenu() {
+  mobileToggle.classList.toggle('active');
+  mobileMenu.classList.toggle('active');
+  document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : 'auto';
+}
+
+if (mobileToggle) {
+  mobileToggle.onclick = toggleMenu;
 }
 </script>
 </body>
