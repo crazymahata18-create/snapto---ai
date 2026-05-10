@@ -2616,9 +2616,8 @@ async function handleBooking(e) {
   const formData = new FormData(e.target);
   const monthNames2 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   
-  // Try to save to backend
   try {
-    await fetch('/api/public/meetings', {
+    const res = await fetch('/api/public/meetings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2629,23 +2628,28 @@ async function handleBooking(e) {
         time: selectedTime
       })
     });
+    
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Server error');
+    }
+    
+    bookedSlots.push(`${dateKey}-${selectedTime}`);
+    const detailsEl = document.getElementById('booking-confirmed-details');
+    if (detailsEl) {
+      detailsEl.textContent = `📅 ${monthNames2[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}  ⏰ ${selectedTime}`;
+    }
+    timeSel.style.display = 'none';
+    bookForm.style.display = 'none';
+    bookSucc.style.display = 'block';
+    e.target.reset();
   } catch (err) {
-    // Backend unreachable — still confirm
+    alert('Failed to book: ' + err.message);
+  } finally {
+    btn.textContent = 'Confirm Booking';
+    btn.disabled = false;
   }
   
-  // Always show BOOKING DONE
-  bookedSlots.push(`${dateKey}-${selectedTime}`);
-  const detailsEl = document.getElementById('booking-confirmed-details');
-  if (detailsEl) {
-    detailsEl.textContent = `📅 ${monthNames2[selectedDate.getMonth()]} ${selectedDate.getDate()}, ${selectedDate.getFullYear()}  ⏰ ${selectedTime}`;
-  }
-  timeSel.style.display = 'none';
-  bookForm.style.display = 'none';
-  bookSucc.style.display = 'block';
-  e.target.reset();
-  
-  btn.textContent = 'Confirm Booking';
-  btn.disabled = false;
   return false;
 }
 
@@ -2711,20 +2715,25 @@ async function handlePreorder(e) {
   btn.textContent = 'PROCESSING...';
   btn.disabled = true;
   
-  // Always show success — try to save to backend, but confirm regardless
   try {
-    await fetch('/api/public/leads', {
+    const res = await fetch('/api/public/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: emailInput.value })
     });
+    
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Server error');
+    }
+    
+    e.target.style.display = 'none';
+    document.getElementById('preorder-success').style.display = 'block';
   } catch (err) {
-    // Backend unreachable — still confirm
+    alert('Failed to pre-order: ' + err.message);
+    btn.textContent = 'Pre-Order Now';
+    btn.disabled = false;
   }
-  
-  // Show success screen always
-  e.target.style.display = 'none';
-  document.getElementById('preorder-success').style.display = 'block';
 }
 
 // MOBILE MENU LOGIC
