@@ -1,13 +1,34 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+let transporter;
+let isTestAccount = false;
+
+async function initTransporter() {
+  if (process.env.EMAIL_USER === 'your-email@gmail.com' || !process.env.EMAIL_USER) {
+    console.log('[Email Service] Using Ethereal test account since no real credentials provided.');
+    let testAccount = await nodemailer.createTestAccount();
+    transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
+      },
+    });
+    isTestAccount = true;
+  } else {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+    isTestAccount = false;
   }
-});
+}
 
 /**
  * Sends a confirmation email to the user.
@@ -17,16 +38,23 @@ const transporter = nodemailer.createTransport({
  */
 async function sendEmail(toEmail, subject, htmlContent) {
   try {
+    if (!transporter) await initTransporter();
+    
     const mailOptions = {
-      from: `"SnapTo AI" <${process.env.EMAIL_USER}>`,
+      from: `"SnapTo AI" <${isTestAccount ? 'test@snapto.ai' : process.env.EMAIL_USER}>`,
       to: toEmail,
-      bcc: process.env.EMAIL_USER, // This ensures you see a copy in your snapto Gmail!
+      bcc: isTestAccount ? undefined : process.env.EMAIL_USER, // This ensures you see a copy in your snapto Gmail!
       subject: subject,
       html: htmlContent
     };
 
     const info = await transporter.sendMail(mailOptions);
     console.log('[Email Service] Email sent: %s', info.messageId);
+    
+    if (isTestAccount) {
+      console.log('[Email Service] 🟢 PREVIEW URL: %s', nodemailer.getTestMessageUrl(info));
+    }
+    
     return true;
   } catch (err) {
     console.error('[Email Service Error]', err);
