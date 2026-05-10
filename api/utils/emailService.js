@@ -5,20 +5,30 @@ let transporter;
 let isTestAccount = false;
 
 async function initTransporter() {
-  if (process.env.EMAIL_USER === 'your-email@gmail.com' || !process.env.EMAIL_USER) {
-    console.log('[Email Service] Using Ethereal test account since no real credentials provided.');
-    let testAccount = await nodemailer.createTestAccount();
-    transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: testAccount.user, // generated ethereal user
-        pass: testAccount.pass, // generated ethereal password
-      },
-    });
-    isTestAccount = true;
+  const isDefaultUser = process.env.EMAIL_USER === 'your-email@gmail.com' || !process.env.EMAIL_USER;
+  const isDefaultPass = process.env.EMAIL_PASS === 'your-app-password' || !process.env.EMAIL_PASS;
+
+  if (isDefaultUser || isDefaultPass) {
+    console.log('\n[Email Service] ⚠️ WARNING: Real email credentials not found in .env');
+    console.log('[Email Service] 🔄 Using Ethereal test account fallback.');
+    
+    try {
+      let testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      isTestAccount = true;
+    } catch (err) {
+      console.error('[Email Service] ❌ Failed to create Ethereal test account:', err.message);
+    }
   } else {
+    console.log('[Email Service] 🛡️ Attempting to use real credentials for:', process.env.EMAIL_USER);
     transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -32,32 +42,36 @@ async function initTransporter() {
 
 /**
  * Sends a confirmation email to the user.
- * @param {string} toEmail - The recipient's email address.
- * @param {string} subject - The subject of the email.
- * @param {string} htmlContent - The HTML content of the email.
  */
 async function sendEmail(toEmail, subject, htmlContent) {
   try {
     if (!transporter) await initTransporter();
+    if (!transporter) return false;
     
     const mailOptions = {
-      from: `"SnapTo AI" <${isTestAccount ? 'test@snapto.ai' : process.env.EMAIL_USER}>`,
+      from: `"SnapTo AI" <${isTestAccount ? 'no-reply@snapto.ai' : process.env.EMAIL_USER}>`,
       to: toEmail,
-      bcc: isTestAccount ? undefined : process.env.EMAIL_USER, // This ensures you see a copy in your snapto Gmail!
+      bcc: isTestAccount ? undefined : process.env.EMAIL_USER,
       subject: subject,
       html: htmlContent
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('[Email Service] Email sent: %s', info.messageId);
+    console.log('[Email Service] ✅ Email sent to:', toEmail);
     
     if (isTestAccount) {
-      console.log('[Email Service] 🟢 PREVIEW URL: %s', nodemailer.getTestMessageUrl(info));
+      console.log('[Email Service] 🔗 VIEW EMAIL PREVIEW HERE: %s', nodemailer.getTestMessageUrl(info));
     }
     
     return true;
   } catch (err) {
-    console.error('[Email Service Error]', err);
+    if (err.code === 'EAUTH') {
+      console.error('\n[Email Service] ❌ AUTHENTICATION FAILED!');
+      console.error('[Email Service] 💡 Check your .env file: EMAIL_USER and EMAIL_PASS are incorrect.');
+      console.error('[Email Service] 💡 If using Gmail, you MUST use an "App Password", not your regular password.\n');
+    } else {
+      console.error('[Email Service Error]', err.message);
+    }
     return false;
   }
 }
