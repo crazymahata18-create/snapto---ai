@@ -25,6 +25,7 @@ async function initDb() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE,
+      email TEXT,
       password TEXT,
       name TEXT,
       role TEXT,
@@ -41,9 +42,19 @@ async function initDb() {
     try {
       await db.exec('ALTER TABLE users ADD COLUMN last_login DATETIME');
       await db.exec('ALTER TABLE users ADD COLUMN last_active DATETIME');
-      console.log('[DB] Migrated users table with new columns');
+      console.log('[DB] Migrated users table with last_login/active columns');
     } catch (err) {
-      console.error('[DB] Migration error:', err.message);
+      console.error('[DB] Migration error (login columns):', err.message);
+    }
+  }
+
+  const hasEmail = tableInfo.some(col => col.name === 'email');
+  if (!hasEmail) {
+    try {
+      await db.exec('ALTER TABLE users ADD COLUMN email TEXT');
+      console.log('[DB] Migrated users table with email column');
+    } catch (err) {
+      console.error('[DB] Migration error (email column):', err.message);
     }
   }
 

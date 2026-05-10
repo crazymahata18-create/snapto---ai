@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { getDb } = require('../db/database');
 const { authMiddleware } = require('../middleware/auth');
+const { sendWelcomeEmail } = require('../utils/emailService');
 
 const router = express.Router();
 
@@ -60,10 +61,10 @@ router.post('/login', async (req, res) => {
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, name } = req.body;
+    const { username, password, name, email } = req.body;
 
-    if (!username || !password || !name) {
-      return res.status(400).json({ error: 'Username, password, and name are required.' });
+    if (!username || !password || !name || !email) {
+      return res.status(400).json({ error: 'Username, password, name, and email are required.' });
     }
 
     const db = await getDb();
@@ -78,9 +79,12 @@ router.post('/register', async (req, res) => {
     const userId = 'usr_' + Date.now();
 
     await db.run(
-      'INSERT INTO users (id, username, password, name, role) VALUES (?, ?, ?, ?, ?)',
-      [userId, username, hashedPw, name, 'viewer']
+      'INSERT INTO users (id, username, email, password, name, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, username, email, hashedPw, name, 'viewer']
     );
+
+    // Send Welcome Email
+    await sendWelcomeEmail(email, name);
 
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new Error("CRITICAL: JWT_SECRET environment variable is missing.");

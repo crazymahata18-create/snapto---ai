@@ -32,7 +32,7 @@ const API = (() => {
   return {
     // Auth
     login: (username, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
-    register: (username, password, name) => request('/auth/register', { method: 'POST', body: JSON.stringify({ username, password, name }) }),
+    register: (username, password, name, email) => request('/auth/register', { method: 'POST', body: JSON.stringify({ username, password, name, email }) }),
     getMe: () => request('/auth/me'),
 
     // Employees

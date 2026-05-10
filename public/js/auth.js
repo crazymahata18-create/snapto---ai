@@ -29,8 +29,8 @@ const Auth = (() => {
     return data;
   }
 
-  async function register(username, password, name) {
-    const data = await API.register(username, password, name);
+  async function register(username, password, name, email) {
+    const data = await API.register(username, password, name, email);
     if (data.success) {
       setSession(data.token, data.user);
     }

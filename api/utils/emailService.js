@@ -112,4 +112,26 @@ async function sendBookingConfirmation(toEmail, name = 'Valued Customer', date, 
   return await sendEmail(toEmail, subject, htmlContent);
 }
 
-module.exports = { sendBookingConfirmation, sendPreOrderConfirmation };
+/**
+ * Sends a welcome email to newly registered users.
+ */
+async function sendWelcomeEmail(toEmail, name) {
+  const subject = 'Welcome to SnapTo AI Portal';
+  const htmlContent = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+      <h2 style="color: #00e5ff;">Welcome to SnapTo AI!</h2>
+      <p>Hello ${name},</p>
+      <p>Your account has been successfully created on the SnapTo AI Facility Intelligence Platform.</p>
+      <p>You can now log in to your dashboard to monitor your workplace intelligence, manage facility safety, and access real-time AI insights.</p>
+      <div style="margin: 20px 0;">
+        <a href="http://localhost:3000/portal.html" style="background: #00e5ff; color: #000; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px;">Access Your Portal</a>
+      </div>
+      <p>Thank you for joining our ecosystem.</p>
+      <hr style="border: 0; border-top: 1px solid #eee;">
+      <p style="font-size: 0.8rem; color: #666;">SnapTo AI Operations Team</p>
+    </div>
+  `;
+  return await sendEmail(toEmail, subject, htmlContent);
+}
+
+module.exports = { sendBookingConfirmation, sendPreOrderConfirmation, sendWelcomeEmail };
